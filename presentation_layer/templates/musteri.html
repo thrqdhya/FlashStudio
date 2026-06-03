@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- İSTATİSTİK KARTLARI -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 bg-white border-start border-primary border-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted text-uppercase small font-weight-bold">Toplam Müşteri</h6>
+                    <h3 class="mb-0 font-weight-bold text-dark">{{ musteriler|length }}</h3>
+                </div>
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                    <i class="fa-solid fa-users fa-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 bg-white border-start border-success border-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted text-uppercase small font-weight-bold">Aktif Rezervasyon</h6>
+                    <h3 class="mb-0 font-weight-bold text-dark">Görüntüle</h3>
+                </div>
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                    <i class="fa-solid fa-calendar-days fa-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 bg-white border-start border-warning border-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted text-uppercase small font-weight-bold">Kasa Durumu</h6>
+                    <h3 class="mb-0 font-weight-bold text-dark">₺ 0.00</h3>
+                </div>
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                    <i class="fa-solid fa-wallet fa-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ANA FORM VE TABLO ALANI -->
+<div class="row">
+    <!-- Sol Kolon: Yeni Müşteri Ekleme Formu -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header py-3 bg-light">
+                <i class="fa-solid fa-user-plus text-primary me-2"></i><strong>Yeni Müşteri Ekle</strong>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                                <i class="fa-solid {{ 'fa-circle-check' if category == 'success' else 'fa-triangle-exclamation' }} me-2"></i>{{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form action="/musteri/ekle" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold small">Müşteri Adı</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-user text-muted"></i></span>
+                            <input type="text" name="ad" class="form-control" placeholder="Örn: Alican" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold small">Müşteri Soyadı</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-user text-muted"></i></span>
+                            <input type="text" name="soyad" class="form-control" placeholder="Örn: Kara" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold small">Telefon Numarası</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-phone text-muted"></i></span>
+                            <input type="text" name="telefon" class="form-control" placeholder="0 (5xx) xxx-xxxx" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold small">E-Posta Adresi</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-envelope text-muted"></i></span>
+                            <input type="email" name="eposta" class="form-control" placeholder="ornek@mail.com" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label font-weight-bold small">Açık Adres</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-location-dot text-muted"></i></span>
+                            <textarea name="adres" class="form-control" rows="2" placeholder="Adres bilgilerini giriniz..." required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 font-weight-bold shadow-sm">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Veritabanına Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sağ Kolon: Veritabanı Müşteri Listesi -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center bg-light">
+                <div>
+                    <i class="fa-solid fa-table-list text-dark me-2"></i><strong>Sistemde Kayıtlı Müşteriler</strong>
+                </div>
+                <span class="badge bg-dark rounded-pill">{{ musteriler|length }} Kayıt</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="px-3" width="80">ID</th>
+                                <th>Ad Soyad</th>
+                                <th><i class="fa-solid fa-phone me-1 text-muted"></i> Telefon</th>
+                                <th><i class="fa-solid fa-envelope me-1 text-muted"></i> Mail</th>
+                                <th><i class="fa-solid fa-location-dot me-1 text-muted"></i> Adres</th>
+                                <th class="text-center" width="100">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in musteriler %}
+                            <tr>
+                                <td class="px-3 text-muted">#{{ m.id }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-light p-2 rounded text-secondary d-none d-sm-block">
+                                            <i class="fa-solid fa-user-tie"></i>
+                                        </div>
+                                        <div><strong>{{ m.ad }} {{ m.soyad }}</strong></div>
+                                    </div>
+                                </td>
+                                <td>{{ m.telefon }}</td>
+                                <td><span class="text-secondary">{{ m.eposta }}</span></td>
+                                <td><small class="text-muted">{{ m.adres }}</small></td>
+                                <td class="text-center">
+                                    <a href="/musteri/sil/{{ m.id }}" class="btn btn-outline-danger btn-action" onclick="return confirm('Bu müşteriyi silmek istediğinize emin misiniz?')">
+                                        <i class="fa-solid fa-trash-can"></i> Sil
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <i class="fa-solid fa-folder-open fa-2xl mb-3 d-block text-light"></i>
+                                    Henüz veritabanında kayıtlı müşteri bulunamadı.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+# Mengabaikan file sampah python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Mengabaikan log dan file konfigurasi lokal
+*.log
+.vscode/

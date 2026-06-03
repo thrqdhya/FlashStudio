@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <!-- Sol Kolon: Yeni Fotoğrafçı Ekleme Formu -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header py-3 bg-light">
+                <i class="fa-solid fa-user-plus text-primary me-2"></i><strong>Yeni Fotoğrafçı Ekle</strong>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} py-2 small">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <form action="/fotografci/ekle" method="POST">
+                    <div class="mb-2"><label class="small font-weight-bold">Adı</label><input type="text" name="ad" class="form-control" required></div>
+                    <div class="mb-2"><label class="small font-weight-bold">Soyadı</label><input type="text" name="soyad" class="form-control" required></div>
+                    <div class="mb-2">
+                        <label class="small font-weight-bold">Uzmanlık Alanı</label>
+                        <input type="text" name="uzmanlik" class="form-control" placeholder="Örn: Stüdyo, Dış Çekim, Düğün" required>
+                    </div>
+                    <div class="mb-3"><label class="small font-weight-bold">Telefon</label><input type="text" name="telefon" class="form-control" placeholder="05xxxxxxxx"></div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-user-check me-2"></i>Sisteme Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Sağ Kolon: Fotoğrafçı Kadrosu Listesi -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header py-3 bg-light"><strong>📸 Stüdyo Fotoğrafçı Kadrosu</strong></div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                    <thead class="table-light">
+                        <tr><th>ID</th><th>Ad Soyad</th><th>Uzmanlık Alanı</th><th>Telefon</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for f in fotografcilar %}
+                        <tr>
+                            <td>#{{ f.id }}</td>
+                            <td><strong>{{ f.ad }} {{ f.soyad }}</strong></td>
+                            <td><span class="badge bg-info text-dark">{{ f.uzmanlik }}</span></td>
+                            <td>{{ f.telefon if f.telefon else '-' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center text-muted py-4">Henüz kayıtlı bir fotoğrafçı bulunamadı.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
